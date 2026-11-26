@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Campus Room Availability Checker</title>
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --ink:#1b2330; --muted:#5b6678; --ok:#0a7d3b; --okbg:#e6f6ec; --bad:#b42318; --badbg:#fdecea; --warn:#8a5a00; --warnbg:#fff4de; --line:#d6dbe5; --brand:#2447c5; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, Arial, sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.4rem; margin: 8px 0 4px; }
+  p.sub { margin:0 0 16px; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  input[type=datetime-local], input[type=number] { width:100%; padding:10px; font-size:1rem; border:1px solid var(--line); border-radius:8px; }
+  .row { display:flex; align-items:center; gap:8px; margin-top:12px; }
+  button { margin-top:16px; width:100%; padding:12px; font-size:1rem; font-weight:600; color:#fff; background:var(--brand); border:0; border-radius:8px; cursor:pointer; }
+  button:focus-visible, input:focus-visible { outline:3px solid #9db4ff; outline-offset:2px; }
+  #result { margin-top:16px; padding:12px; border-radius:8px; font-weight:600; display:none; }
+  #result.ok { display:block; background:var(--okbg); color:var(--ok); }
+  #result.bad { display:block; background:var(--badbg); color:var(--bad); }
+  #result.warn { display:block; background:var(--warnbg); color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:6px; border-bottom:1px solid var(--line); }
+  .scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Smart Campus: Room A-101</h1>
+  <p class="sub">Fictional demo data. No login, no payment, no database.</p>
+
+  <section class="card" aria-labelledby="form-title">
+    <h2 id="form-title" style="font-size:1.05rem;margin:0">Check availability</h2>
+    <label for="start">Start time</label>
+    <input id="start" type="datetime-local">
+    <label for="duration">Duration (minutes, 1-120)</label>
+    <input id="duration" type="number" inputmode="numeric" step="1" value="60">
+    <div class="row"><input id="blocked" type="checkbox"><label for="blocked" style="margin:0">Room is blocked (maintenance)</label></div>
+    <button id="check" type="button">Check</button>
+    <div id="result" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2 style="font-size:1.05rem;margin:0 0 8px">Existing bookings (read only)</h2>
+    <div class="scroll"><table><thead><tr><th>ID</th><th>Title</th><th>Start</th><th>End</th></tr></thead><tbody id="bookings"></tbody></table></div>
+  </section>
+</main>
+<script src="rules.js"></script>
+<script>
+  // 3) UI DISPLAY only. Uses textContent (never innerHTML) so user input cannot inject markup.
+  var R = window.SmartCampusRules;
+  var $ = function (id) { return document.getElementById(id); };
+
+  R.BOOKINGS.forEach(function (b) {
+    var tr = document.createElement('tr');
+    [b.id, b.title, b.start.replace('T', ' '), b.end.replace('T', ' ')].forEach(function (t) {
+      var td = document.createElement('td'); td.textContent = t; tr.appendChild(td);
+    });
+    $('bookings').appendChild(tr);
+  });
+
+  $('check').addEventListener('click', function () {
+    var out = R.checkAvailability(
+      { start: $('start').value, duration: $('duration').value, blocked: $('blocked').checked },
+      R.BOOKINGS, new Date());
+    var box = $('result');
+    box.className = out.available ? 'ok' : (out.valid ? 'bad' : 'warn');
+    box.textContent = out.message + (out.code && !out.available ? '  [' + out.code + ']' : '');
+  });
+</script>
+</body>
+</html>

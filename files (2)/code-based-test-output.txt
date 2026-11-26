@@ -1,0 +1,15 @@
+PASS T1 | valid free interval -> Available | expected Available/OK | observed Available/OK | "Available: the room is free for the chosen time."
+PASS T2 | overlap with booking -> Unavailable | expected Unavailable/OVERLAP | observed Unavailable/OVERLAP | "Unavailable: the room is already booked at this time."
+PASS T3 | blocked room -> Unavailable | expected Unavailable/ROOM_BLOCKED | observed Unavailable/ROOM_BLOCKED | "Unavailable: the room is blocked."
+PASS T4 | duration = 0 -> validation error | expected Unavailable/INVALID_DURATION_RANGE | observed Unavailable/INVALID_DURATION_RANGE | "Duration must be more than 0 and at most 120 minutes."
+PASS T5 | duration = 121 -> validation error | expected Unavailable/INVALID_DURATION_RANGE | observed Unavailable/INVALID_DURATION_RANGE | "Duration must be more than 0 and at most 120 minutes."
+PASS T6 | past start time -> validation error | expected Unavailable/INVALID_START_PAST | observed Unavailable/INVALID_START_PAST | "The start time must be in the future."
+PASS T7 | adjacent interval -> Available | expected Available/OK | observed Available/OK | "Available: the room is free for the chosen time."
+PASS S1 | script text as start -> rejected | expected Unavailable/INVALID_START_FORMAT | observed Unavailable/INVALID_START_FORMAT | "Please choose a valid start date and time."
+PASS S2 | HTML text as duration -> rejected | expected Unavailable/INVALID_DURATION_FORMAT | observed Unavailable/INVALID_DURATION_FORMAT | "Please enter the duration as a whole number of minutes."
+PASS S3 | empty duration -> rejected | expected Unavailable/INVALID_DURATION_FORMAT | observed Unavailable/INVALID_DURATION_FORMAT | "Please enter the duration as a whole number of minutes."
+PASS E1 | boundary: exactly 120 min -> Available | expected Available/OK | observed Available/OK | "Available: the room is free for the chosen time."
+PASS E2 | start equal to now -> past error | expected Unavailable/INVALID_START_PAST | observed Unavailable/INVALID_START_PAST | "The start time must be in the future."
+PASS T8 | booking data unchanged after all checks | expected unchanged | observed unchanged
+
+TOTAL: 13 passed, 0 failed, 13 cases, 9 ms

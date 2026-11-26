@@ -1,0 +1,13 @@
+PASS T1 | valid free interval -> Available | expected Available/OK | observed Available/OK
+PASS T2 | overlap with booking -> Unavailable | expected Unavailable/OVERLAP | observed Unavailable/OVERLAP
+PASS T3 | blocked room -> Unavailable | expected Unavailable/ROOM_BLOCKED | observed Unavailable/ROOM_BLOCKED
+PASS T4 | duration = 0 -> validation error | expected Unavailable/INVALID_DURATION_RANGE | observed Unavailable/INVALID_DURATION_RANGE
+PASS T5 | duration = 121 -> validation error | expected Unavailable/INVALID_DURATION_RANGE | observed Unavailable/INVALID_DURATION_RANGE
+PASS T6 | past start time -> validation error | expected Unavailable/INVALID_START_PAST | observed Unavailable/INVALID_START_PAST
+PASS T7 | adjacent interval -> Available | expected Available/OK | observed Available/OK
+PASS S1 | script text as start -> rejected | expected Unavailable/INVALID_START_FORMAT | observed Unavailable/INVALID_START_FORMAT
+PASS S2 | HTML text as duration -> rejected | expected Unavailable/INVALID_DURATION_FORMAT | observed Unavailable/INVALID_DURATION_FORMAT
+PASS S3 | empty duration -> rejected | expected Unavailable/INVALID_DURATION_FORMAT | observed Unavailable/INVALID_DURATION_FORMAT
+PASS T8 | booking data unchanged | observed unchanged
+
+TOTAL (SIMULATED, Node + mock widgets): 11 passed, 0 failed
